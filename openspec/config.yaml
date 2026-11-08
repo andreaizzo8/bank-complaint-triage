@@ -1,0 +1,41 @@
+schema: spec-driven
+
+# Project context: constraints an agent cannot infer from the code.
+# Full background lives in docs/PROJECT_BRIEF.md and docs/ROADMAP.md.
+context: |
+  Purpose: personal learning project exploring applied LLM engineering. LLM triage (product, issue,
+  urgency, sentiment) + RAG Q&A over the public CFPB Consumer Complaint Database,
+  measured against the dataset's real labels and packaged like a real service.
+
+  Tech stack: Python 3.11+, uv, ruff, pytest, Pydantic, FastAPI,
+  PostgreSQL 16 + pgvector (Docker Compose), Ollama on the host for LLMs and
+  embeddings, scikit-learn for the classical baseline, GitHub Actions for CI.
+  Layout: src/complaint_triage/, tests/, scripts/, prompts/, docs/.
+
+  Hard constraints:
+  - Zero cost: no paid APIs/services. LLMs and embeddings run locally via Ollama,
+    behind a small LLMClient interface. No paid providers as dependencies or defaults.
+  - Runs on a Windows laptop: small models (3B-8B), configurable sample sizes
+    (default ~5k complaints for evaluation, ~20k for RAG), fixed random seed.
+  - No raw data in git: downloads go to data/ (gitignored); scripts re-download.
+  - Config/secrets via environment variables; keep .env.example updated.
+  - LLM output is never executed or used to build SQL; API inputs have length limits.
+  - Prompts live in versioned files prompts/<task>_v<N>.md, never inline.
+  - Unit tests mock LLM calls and network; CI never calls real models.
+
+  Domain (CFPB data): public domain, PII already scrubbed by the CFPB. Ground truth
+  labels are Product/Sub-product and Issue/Sub-issue. Only rows with a non-empty
+  "Consumer complaint narrative" are used. Product names changed over the years,
+  so work on a recent window of full years for a consistent label set.
+
+  Developer is learning the stack: prefer simple, well-known solutions and state
+  the "why" of non-obvious decisions briefly, with the alternatives considered.
+
+rules:
+  proposal:
+    - State what is out of scope
+    - Reference the matching row of docs/ROADMAP.md
+  tasks:
+    - Every change adds or updates tests
+    - Each task group ends with something that runs and can be committed
+    - Include a final verification task with the exact commands to run
